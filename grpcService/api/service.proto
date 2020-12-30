@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option go_package = "ilya225/car-service";
+option java_multiple_files = true;
+option java_package = "example.org.grpc.sample";
+option java_outer_classname = "CarService";
+
+package car_service;
+
+
+service CarService {
+  rpc GetCar (GetCarByIDRequest) returns (CarResponse) {}
+}
+
+message GetCarByIDRequest {
+  string ID = 1;
+}
+
+
+message CarResponse {
+  string ID = 1;
+}
+

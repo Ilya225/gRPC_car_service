@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+option go_package = "ilya225/car-service-client";
+option java_multiple_files = true;
+option java_package = "example.org.car.service.client";
+option java_outer_classname = "CarServiceClient";
+
+package car_service_client;
+
+service CarService {
+  rpc GetCar (GetCarByIDRequest) returns (CarResponse) {}
+}
+
+message GetCarByIDRequest {
+  string ID = 1;
+}
+
+
+message CarResponse {
+  string ID = 1;
+}
