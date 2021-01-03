@@ -5,11 +5,14 @@ import (
 	"grpcChassis/auto_scout_scrapper/models"
 	"log"
 	"net/http"
+	"strconv"
 )
 
-func Scrape() (*models.AutoScoutCarResponse, error) {
+func Scrape(page int) ([]*models.AutoScoutCarResponse, error) {
 	// Request the HTML page.
-	res, err := http.Get("https://www.autoscout24.com/lst?&sort=standard&desc=0&offer=J%2CU%2CO%2CD%2CS&ustate=N%2CU&size=20&atype=C&page=1")
+	requestString := "https://www.autoscout24.com/lst?&sort=standard&desc=0&" +
+		"offer=J%2CU%2CO%2CD%2CS&ustate=N%2CU&size=20&atype=C&page=" + strconv.Itoa(page)
+	res, err := http.Get(requestString)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -22,20 +25,24 @@ func Scrape() (*models.AutoScoutCarResponse, error) {
 	return ParsePage(res)
 }
 
-func ParsePage(res *http.Response) (*models.AutoScoutCarResponse, error) {
+func ParsePage(res *http.Response) ([]*models.AutoScoutCarResponse, error) {
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	carModel := &models.AutoScoutCarResponse{}
+	var carModels []*models.AutoScoutCarResponse
 
 	doc.Find(".cl-list-element").Each(func(i int, s *goquery.Selection) {
+		carModel := &models.AutoScoutCarResponse{}
 
-		carModel.MakeModel = s.Find("cldt-summary-makemodel").First().Text()
-		carModel.Version = s.Find("cldt-summary-version").First().Text()
-		carModel.Price = s.Find("cldt-price").First().Text()
+		UUID, isUUID := s.Attr("data-guid")
+
+		carModel.UUID = UUID
+		carModel.MakeModel = s.Find(".cldt-summary-makemodel").First().Text()
+		carModel.Version = s.Find(".cldt-summary-version").First().Text()
+		carModel.Price = s.Find(".cldt-price").First().Text()
 
 
 		// Link
@@ -64,7 +71,14 @@ func ParsePage(res *http.Response) (*models.AutoScoutCarResponse, error) {
 
 			}
 		})
+
+		if !isUUID {
+			log.Print("No uuid: %v\n", carModel)
+			return
+		}
+
+		carModels = append(carModels, carModel)
 	})
 
-	return carModel, nil
+	return carModels, nil
 }

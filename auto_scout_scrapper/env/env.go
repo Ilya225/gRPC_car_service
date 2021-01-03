@@ -16,19 +16,18 @@ type PostgreConfig struct {
 	SSLMode  bool   `envconfig:"POSTGRE_SSL" default:"false"`
 }
 
-func (pc* PostgreConfig) DataSourceName() string {
+func (pc *PostgreConfig) DataSourceName() string {
 	return fmt.Sprintf("host=%s port=%d user=%s "+
 		"password=%s dbname=%s sslmode=disable",
 		pc.Host, pc.Port, pc.User, pc.Password, pc.DBName)
 }
 
-// Singleton implementation.
 type Environment struct {
 	PostgreConfig PostgreConfig
 }
 
 var (
-	envConfig *Environment
+	envConfig Environment
 	once      sync.Once
 )
 
@@ -40,5 +39,5 @@ func Config() *Environment {
 			log.Fatal(err.Error())
 		}
 	})
-	return envConfig
+	return &envConfig
 }
