@@ -9,9 +9,9 @@ import (
 
 const (
 	carInsert = "INSERT INTO car " +
-		"(uuid, source, link, make, model, version, price, currency, mileage, mileage_unit, first_registration, " +
+		"(source_id, source, link, make, model, version, price, currency, mileage, mileage_unit, first_registration, " +
 		"power, power_unit, offer_type, previous_owners_number, transmission_type, fuel_type, fuel_consumption, co2_emission) " +
-		"VALUES (:uuid, :source, :link, :make, :model, :version, :price, :currency, :mileage, :mileage_unit, :first_registration, " +
+		"VALUES (:source_id, :source, :link, :make, :model, :version, :price, :currency, :mileage, :mileage_unit, :first_registration, " +
 		":power, :power_unit, :offer_type, :previous_owners_number, " +
 		":transmission_type, :fuel_type, :fuel_consumption, :co2_emission) ON CONFLICT DO NOTHING"
 )
@@ -21,13 +21,13 @@ type Repository struct {
 	db *sqlx.DB
 }
 
-func New(db* sqlx.DB) *Repository {
+func New(db *sqlx.DB) *Repository {
 	return &Repository{
 		db: db,
 	}
 }
 
-func (r* Repository) SaveCar(car *models.Car) error {
+func (r *Repository) SaveCar(car *models.Car) error {
 	tx := r.db.MustBegin()
 	_, err := tx.NamedExec(carInsert, car)
 	if err != nil {
@@ -38,6 +38,6 @@ func (r* Repository) SaveCar(car *models.Car) error {
 	return err
 }
 
-func (r* Repository) Close() error {
+func (r *Repository) Close() error {
 	return r.db.Close()
 }

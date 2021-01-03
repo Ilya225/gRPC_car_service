@@ -9,19 +9,18 @@ import (
 )
 
 const (
-	address     = "localhost:50051"
+	address = "localhost:50051"
 )
 
 func main() {
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
-	log.Fatalf("did not connect: %v", err)
+		log.Fatalf("did not connect: %v", err)
 	}
 
 	defer conn.Close()
 
 	c := client.NewCarServiceClient(conn)
-
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()

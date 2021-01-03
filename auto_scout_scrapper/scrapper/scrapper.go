@@ -44,7 +44,6 @@ func ParsePage(res *http.Response) ([]*models.AutoScoutCarResponse, error) {
 		carModel.Version = s.Find(".cldt-summary-version").First().Text()
 		carModel.Price = s.Find(".cldt-price").First().Text()
 
-
 		// Link
 		carModel.Link, _ = s.Find("a[data-item-name='detail-page-link']").First().Attr("href")
 
